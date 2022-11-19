@@ -3,12 +3,7 @@ const fs = require("fs");
 const generateMarkdown = require("./utils/generateMarkdown");
 
 //questions
-inquirer.prompt([
-  {
-    type: "input",
-    name: "fileTitle",
-    message: "Title of this new file we are creating? (required)",
-  },
+var questions = [
   {
     type: "input",
     name: "projectTitle",
@@ -30,7 +25,7 @@ inquirer.prompt([
     message: "Usage, or example of this project",
   },
   {
-    type: "checkbox",
+    type: "list",
     name: "license",
     message: "Choose the license",
     choices: ["Apache", "MIT", "GPL", "none"],
@@ -47,28 +42,29 @@ inquirer.prompt([
   },
   {
     type: "input",
-    name: "question",
-    message: "Your contact info",
+    name: "github",
+    message: "What is your Github username?",
   },
-]);
-
-function writeToFile(fileName, data) {
-  fs.appendFile(`${fileName}.md`, data, (err) =>
-    err ? console.error(err) : console.log(`${fileName}.md has been generated.`)
-  );
-}
+  {
+    type: "input",
+    name: "email",
+    message: "What is your email address?",
+  },
+];
 
 //function to initialize
-async function init() {
-  let answers = await userInput();
-  writeToFile(answers.fileName, generateMarkdown(answers));
+function init() {
+  inquirer.prompt(questions).then((responses) => {
+    //console.log(responses);
+    var readmeOutput = generateMarkdown(responses);
+    //console.log(readmeOutput);
+    fs.writeFile("README.md", readmeOutput, (err) => {
+      if (err) {
+        console.log("cannot create file!");
+      }
+      console.log("successfully create file!");
+    });
+  });
 }
 
 init();
-
-//   .then((responses) => {
-//     const filename = `${responses.name.toLowercase()}.md`;
-//     fs.writeFile(filename, JSON.stringify(responses, null, 2), (err) =>
-//       err ? console.log(err) : console.log("success!")
-//     );
-//   });
